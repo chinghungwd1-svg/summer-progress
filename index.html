@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翰林輔才115 暑期進度追蹤</title>
+    <style>
+        /* ===== 全域設定 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'PingFang TC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fb;
+            color: #1a2332;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* ===== 標頭 ===== */
+        .header {
+            background: linear-gradient(135deg, #1a3a5c, #2a5f7a);
+            color: #fff;
+            padding: 24px 30px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        .header-right {
+            text-align: right;
+        }
+        .header-right .today {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .header-right .week-info {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+
+        /* ===== 統計看板 ===== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a3a5c;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #6b7a8f;
+            margin-top: 2px;
+        }
+        .stat-card .bar {
+            margin-top: 8px;
+            height: 6px;
+            background: #e9ecf0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .stat-card .bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2a7f5a, #4caf84);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        /* ===== 工具列 ===== */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .toolbar .filter-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .toolbar button {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #e9ecf0;
+            color: #1a2332;
+            transition: all 0.2s;
+        }
+        .toolbar button:hover {
+            background: #d5dbe3;
+        }
+        .toolbar button.active {
+            background: #1a3a5c;
+            color: #fff;
+        }
+        .toolbar .btn-reset {
+            background: #fde8e8;
+            color: #b33;
+            margin-left: auto;
+        }
+        .toolbar .btn-reset:hover {
+            background: #fcd5d5;
+        }
+        .toolbar .btn-reset-week {
+            background: #fff3e0;
+            color: #b86b1f;
+        }
+        .toolbar .btn-reset-week:hover {
+            background: #ffe8cc;
+        }
+
+        /* ===== 週進度區塊 ===== */
+        .week-block {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid #eef1f5;
+            transition: border-color 0.2s;
+        }
+        .week-block.completed {
+            border-left: 5px solid #4caf84;
+        }
+        .week-block.incomplete {
+            border-left: 5px solid #f5a623;
+        }
+        .week-header {
+            padding: 16px 22px;
+            background: #f8faff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .week-header:hover {
+            background: #f0f5ff;
+        }
+        .week-header .week-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a3a5c;
+        }
+        .week-header .week-date {
+            font-size: 14px;
+            color: #6b7a8f;
+            margin-left: 12px;
+        }
+        .week-header .week-progress {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2a5f7a;
+        }
+        .week-body {
+            padding: 0 22px 22px 22px;
+            display: none;
+        }
+        .week-body.open {
+            display: block;
+        }
+
+        /* ===== 每日進度表 ===== */
+        .day-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 14px;
+        }
+        @media (max-width: 768px) {
+            .day-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .day-card {
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid #eef1f5;
+        }
+        .day-card .day-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1a3a5c;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .day-card .day-title .check-all {
+            font-size: 13px;
+            font-weight: 400;
+            color: #6b7a8f;
+            cursor: pointer;
+        }
+        .day-card .day-title .check-all:hover {
+            color: #1a3a5c;
+        }
+        .day-card .subject-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 4px 0;
+            border-bottom: 1px dashed #eef1f5;
+            font-size: 14px;
+        }
+        .day-card .subject-row:last-child {
+            border-bottom: none;
+        }
+        .day-card .subject-row .subject-label {
+            min-width: 44px;
+            font-weight: 600;
+            color: #2a5f7a;
+            font-size: 13px;
+        }
+        .day-card .subject-row .task {
+            flex: 1;
+            color: #1a2332;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .day-card .subject-row .task .done {
+            text-decoration: line-through;
+            color: #8a9aa8;
+        }
+        .day-card .subject-row input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: #2a7f5a;
+            flex-shrink: 0;
+        }
+        .day-card .subject-row .task-detail {
+            font-size: 12px;
+            color: #6b7a8f;
+            display: block;
+            margin-top: 1px;
+        }
+        .day-card .subject-row .tag {
+            font-size: 11px;
+            background: #e9ecf0;
+            padding: 0 8px;
+            border-radius: 10px;
+            color: #4a5a6a;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .day-card .subject-row .tag.review {
+            background: #e3f0fa;
+            color: #1a5a7a;
+        }
+        .day-card .subject-row .tag.advance {
+            background: #fef3e0;
+            color: #a86a1a;
+        }
+
+        /* ===== 科目篩選高亮 ===== */
+        .filter-highlight .subject-row[data-subject]:not(.show) {
+            display: none;
+        }
+
+        /* ===== 彈窗 ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px 32px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        .modal h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        .modal p {
+            font-size: 14px;
+            color: #4a5a6a;
+            margin-bottom: 18px;
+        }
+        .modal .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .modal .btn-group button {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal .btn-group .btn-confirm {
+            background: #d33;
+            color: #fff;
+        }
+        .modal .btn-group .btn-confirm:hover {
+            background: #b22;
+        }
+        .modal .btn-group .btn-cancel {
+            background: #e9ecf0;
+            color: #1a2332;
+        }
+        .modal .btn-group .btn-cancel:hover {
+            background: #d5dbe3;
+        }
+
+        /* ===== 列印優化 ===== */
+        @media print {
+            body { background: #fff; padding: 10px; }
+            .header { background: #1a3a5c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .stat-card { box-shadow: none; border: 1px solid #ddd; }
+            .week-block { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .toolbar .btn-reset, .toolbar .btn-reset-week { display: none; }
+            .day-card .subject-row input[type="checkbox"] { accent-color: #2a7f5a; }
+            .week-body { display: block !important; }
+            .modal-overlay { display: none !important; }
+            .day-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+
+    <!-- ===== 標頭 ===== -->
+    <div class="header">
+        <div>
+            <h1>📚 翰林輔才115 暑期進度追蹤</h1>
+            <div class="subtitle">升國二 · 複習國一＋先修國二上 · W1~W9</div>
+        </div>
+        <div class="header-right">
+            <div class="today" id="todayDisplay"></div>
+            <div class="week-info" id="weekInfo">當前進度：—</div>
+        </div>
+    </div>
+
+    <!-- ===== 統計看板 ===== -->
+    <div class="stats" id="statsContainer">
+        <div class="stat-card">
+            <div class="num" id="statTotal">0/0</div>
+            <div class="label">總完成數</div>
+            <div class="bar"><div class="fill" id="statTotalBar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card">
+            <div class="num" id="statWeek">0%</div>
+            <div class="label">本週完成率</div>
+            <div class="bar"><div class="fill" id="statWeekBar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card">
+            <div class="num" id="statSubject">0</div>
+            <div class="label">已達標科目數</div>
+            <div class="bar"><div class="fill" id="statSubjectBar" style="width:0%"></div></div>
+        </div>
+    </div>
+
+    <!-- ===== 工具列 ===== -->
+    <div class="toolbar">
+        <div class="filter-group">
+            <button class="active" data-filter="all">📋 全部</button>
+            <button data-filter="國文">📘 國文</button>
+            <button data-filter="英語">📗 英語</button>
+            <button data-filter="數學">📙 數學</button>
+            <button data-filter="自然">📒 自然</button>
+            <button data-filter="社會">🌍 社會</button>
+        </div>
+        <button class="btn-reset-week" onclick="resetWeek()">↺ 重置本週</button>
+        <button class="btn-reset" onclick="showResetModal()">🗑 重置全部</button>
+    </div>
+
+    <!-- ===== 週進度區塊（由 JS 動態產生） ===== -->
+    <div id="weekContainer"></div>
+
+    <!-- ===== 重置確認彈窗 ===== -->
+    <div class="modal-overlay" id="resetModal">
+        <div class="modal">
+            <h3>⚠️ 確認重置</h3>
+            <p>確定要清除 <strong id="resetTargetText">全部</strong> 的進度記錄嗎？<br>此操作無法復原。</p>
+            <div class="btn-group">
+                <button class="btn-cancel" onclick="closeResetModal()">取消</button>
+                <button class="btn-confirm" onclick="confirmReset()">確定重置</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ============================================================
+    //  1. 資料定義 — 所有進度資料
+    // ============================================================
+    const SUBJECTS = ['國文', '英語', '數學', '自然', '社會'];
+    const SUBJECT_ICONS = {
+        '國文': '📘',
+        '英語': '📗',
+        '數學': '📙',
+        '自然': '📒',
+        '社會': '🌍'
+    };
+
+    // 週次範圍
+    const WEEKS = [
+        { id: 'W1', label: 'W1', date: '7/3 ~ 7/12' },
+        { id: 'W2', label: 'W2', date: '7/13 ~ 7/19' },
+        { id: 'W3', label: 'W3', date: '7/20 ~ 7/26' },
+        { id: 'W4', label: 'W4', date: '7/27 ~ 8/2' },
+        { id: 'W5', label: 'W5', date: '8/3 ~ 8/9' },
+        { id: 'W6', label: 'W6', date: '8/10 ~ 8/16' },
+        { id: 'W7', label: 'W7', date: '8/17 ~ 8/23' },
+        { id: 'W8', label: 'W8', date: '8/24 ~ 8/30' },
+        { id: 'W9', label: 'W9', date: '8/31 ~ 9/1' }
+    ];
+
+    // ============================================================
+    //  2. 各週每日進度資料
+    //     - 每天每科：預計任務文字（含複習/先修標記）
+    // ============================================================
+    const SCHEDULE = {
+        'W1': {
+            days: {
+                '7/3': {
+                    '國文': { task: '形音義D1~D5', tag: '複習' },
+                    '英語': { task: '雪莉L1~L4 + 單字1~20', tag: '複習' },
+                    '英語題': { task: '橘英B1 U1', tag: '複習' },
+                    '數學': { task: '橘數B1 U1 p.5~10', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 乘法公式 p.113~117', tag: '先修' },
+                    '自然': { task: '生物Ch1', tag: '複習' },
+                    '社會': { task: '地理U1', tag: '複習' }
+                },
+                '7/6': {
+                    '國文': { task: '形音義D6~D10', tag: '複習' },
+                    '英語': { task: '雪莉L5~L8 + 單字21~40', tag: '複習' },
+                    '英語題': { task: '橘英B1 U1', tag: '複習' },
+                    '數學': { task: '橘數B1 U1 p.11~17', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 乘法公式 p.118~122', tag: '先修' },
+                    '自然': { task: '生物Ch1 複習＋習題', tag: '複習' },
+                    '社會': { task: '歷史U1', tag: '複習' }
+                },
+                '7/7': {
+                    '國文': { task: '文言文即時通2篇', tag: '先修' },
+                    '英語': { task: '雪莉L1~L8 複習 + 單字41~60', tag: '複習' },
+                    '英語題': { task: '橘英B1 U2', tag: '複習' },
+                    '數學': { task: '橘數B1 U2 因數倍數 p.18~25', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 多項式 p.118~122', tag: '先修' },
+                    '自然': { task: '生物Ch1 總複習', tag: '複習' },
+                    '社會': { task: '公民U1', tag: '複習' }
+                },
+                '7/8': {
+                    '國文': { task: '形音義D1~D10 錯字重寫', tag: '複習' },
+                    '英語': { task: '雪莉L9~L10 + 單字61~80', tag: '複習' },
+                    '英語題': { task: '橘英B1 U2', tag: '複習' },
+                    '數學': { task: '橘數B1 U2 分數運算 p.26~33', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 多項式 p.118~122', tag: '先修' },
+                    '自然': { task: '生物Ch2', tag: '複習' },
+                    '社會': { task: '地理U1 複習', tag: '複習' }
+                },
+                '7/9': {
+                    '國文': { task: '文言文即時通2篇', tag: '先修' },
+                    '英語': { task: '雪莉L11~L13 + 單字81~100', tag: '複習' },
+                    '英語題': { task: '橘英B1 U1~U2 總複習', tag: '複習' },
+                    '數學': { task: '橘數B1 U2 總複習 p.26~33', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 多項式總複習', tag: '先修' },
+                    '自然': { task: '生物Ch2 複習', tag: '複習' },
+                    '社會': { task: '歷史U1 複習', tag: '複習' }
+                },
+                '7/10': {
+                    '國文': { task: '形音義D1~D10 總複習', tag: '複習' },
+                    '英語': { task: '雪莉L9~L13 複習 + 單字總複習', tag: '複習' },
+                    '英語題': { task: '橘英B1 U1~U2 模擬題', tag: '複習' },
+                    '數學': { task: '橘數B1 U1~U2 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 總複習', tag: '先修' },
+                    '自然': { task: '生物Ch2 總複習', tag: '複習' },
+                    '社會': { task: '公民U1 複習', tag: '複習' }
+                }
+            }
+        },
+        'W2': {
+            days: {
+                '7/13': {
+                    '國文': { task: '成語D11~D17', tag: '複習' },
+                    '英語': { task: '雪莉L14~L16 + 單字101~120', tag: '複習' },
+                    '英語題': { task: '橘英B2 U3', tag: '複習' },
+                    '數學': { task: '橘數B1 U2 p.18~25', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 多項式 p.118~122', tag: '先修' },
+                    '自然': { task: '生物Ch2', tag: '複習' },
+                    '社會': { task: '地理U2', tag: '複習' }
+                },
+                '7/14': {
+                    '國文': { task: '輕悅讀2篇', tag: '先修' },
+                    '英語': { task: '雪莉L17~L19 + 單字121~140', tag: '複習' },
+                    '英語題': { task: '橘英B2 U3', tag: '複習' },
+                    '數學': { task: '橘數B1 U2 p.26~33', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 多項式 p.118~122', tag: '先修' },
+                    '自然': { task: '生物Ch2 複習＋習題', tag: '複習' },
+                    '社會': { task: '歷史U2', tag: '複習' }
+                },
+                '7/15': {
+                    '國文': { task: '成語D11~D17 複習', tag: '複習' },
+                    '英語': { task: '雪莉L20~L23 + 單字141~160', tag: '複習' },
+                    '英語題': { task: '橘英B2 U3 複習', tag: '複習' },
+                    '數學': { task: '橘數B1 U2 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 多項式總複習', tag: '先修' },
+                    '自然': { task: '生物Ch2 總複習', tag: '複習' },
+                    '社會': { task: '公民U2', tag: '複習' }
+                },
+                '7/16': {
+                    '國文': { task: '輕悅讀2篇', tag: '先修' },
+                    '英語': { task: '雪莉L14~L23 複習 + 單字161~180', tag: '複習' },
+                    '英語題': { task: '橘英B2 U3 模擬', tag: '複習' },
+                    '數學': { task: '橘數B1 U2 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 總複習', tag: '先修' },
+                    '自然': { task: '生物Ch2 總複習＋習題', tag: '複習' },
+                    '社會': { task: '地理U2 複習', tag: '複習' }
+                },
+                '7/17': {
+                    '國文': { task: '成語D11~D17 總複習', tag: '複習' },
+                    '英語': { task: '雪莉L14~L23 習題 + 單字181~200', tag: '複習' },
+                    '英語題': { task: '橘英B2 U3 總複習', tag: '複習' },
+                    '數學': { task: '橘數B1 U2 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U10 總複習', tag: '先修' },
+                    '自然': { task: '生物Ch2 總複習', tag: '複習' },
+                    '社會': { task: '歷史U2 複習', tag: '複習' }
+                }
+            }
+        },
+        'W3': {
+            days: {
+                '7/20': {
+                    '國文': { task: '形音義D18~D24', tag: '複習' },
+                    '英語': { task: '雪莉L24~L25 + L28~L29 + 單字201~220', tag: '複習' },
+                    '英語題': { task: '橘英B2 U4', tag: '複習' },
+                    '數學': { task: '橘數B1 U3 p.34~38', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 根式 p.123~128', tag: '先修' },
+                    '自然': { task: '生物Ch3', tag: '複習' },
+                    '社會': { task: '地理U3', tag: '複習' }
+                },
+                '7/21': {
+                    '國文': { task: '文言文即時通2篇', tag: '先修' },
+                    '英語': { task: '雪莉L30~L32 + 單字221~240', tag: '複習' },
+                    '英語題': { task: '橘英B2 U4', tag: '複習' },
+                    '數學': { task: '橘數B1 U3 p.39~44', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 根式 p.129~133', tag: '先修' },
+                    '自然': { task: '理化Ch1', tag: '先修' },
+                    '社會': { task: '歷史U3', tag: '複習' }
+                },
+                '7/22': {
+                    '國文': { task: '形音義D18~D24 複習', tag: '複習' },
+                    '英語': { task: '雪莉L33~L35 + 單字241~260', tag: '複習' },
+                    '英語題': { task: '橘英B2 U4 複習', tag: '複習' },
+                    '數學': { task: '橘數B1 U3 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 根式 p.129~133', tag: '先修' },
+                    '自然': { task: '理化Ch1 (續)', tag: '先修' },
+                    '社會': { task: '公民U3', tag: '複習' }
+                },
+                '7/23': {
+                    '國文': { task: '文言文即時通2篇', tag: '先修' },
+                    '英語': { task: '雪莉L24~L35 總複習 + 單字261~280', tag: '複習' },
+                    '英語題': { task: '橘英B2 U4 模擬', tag: '複習' },
+                    '數學': { task: '橘數B1 U3 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 根式總複習', tag: '先修' },
+                    '自然': { task: '理化Ch1 總複習', tag: '先修' },
+                    '社會': { task: '地理U3 複習', tag: '複習' }
+                },
+                '7/24': {
+                    '國文': { task: '形音義D18~D24 總複習', tag: '複習' },
+                    '英語': { task: '雪莉L24~L35 習題 + 單字281~300', tag: '複習' },
+                    '英語題': { task: '橘英B2 U4 總複習', tag: '複習' },
+                    '數學': { task: '橘數B1 U3 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch1 習題', tag: '先修' },
+                    '社會': { task: '歷史U3 複習', tag: '複習' }
+                }
+            }
+        },
+        'W4': {
+            days: {
+                '7/27': {
+                    '國文': { task: '成語D25~D31', tag: '複習' },
+                    '英語': { task: '雪莉L36~L38 + 單字301~320', tag: '複習' },
+                    '英語題': { task: '橘英B2 U5', tag: '複習' },
+                    '數學': { task: '橘數B2 U4 p.45~50', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 畢氏定理 p.123~128', tag: '先修' },
+                    '自然': { task: '生物Ch4', tag: '複習' },
+                    '社會': { task: '地理U4', tag: '複習' }
+                },
+                '7/28': {
+                    '國文': { task: '輕悅讀2篇', tag: '先修' },
+                    '英語': { task: '雪莉L39~L40 + 單字321~340', tag: '複習' },
+                    '英語題': { task: '橘英B2 U5', tag: '複習' },
+                    '數學': { task: '橘數B2 U4 p.51~56', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 畢氏定理 p.129~133', tag: '先修' },
+                    '自然': { task: '理化Ch2', tag: '先修' },
+                    '社會': { task: '歷史U4', tag: '複習' }
+                },
+                '7/29': {
+                    '國文': { task: '成語D25~D31 複習', tag: '複習' },
+                    '英語': { task: '雪莉L36~L40 複習 + 單字341~360', tag: '複習' },
+                    '英語題': { task: '橘英B2 U5 複習', tag: '複習' },
+                    '數學': { task: '橘數B2 U4 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 畢氏定理 p.129~133', tag: '先修' },
+                    '自然': { task: '生物Ch5', tag: '複習' },
+                    '社會': { task: '公民U4', tag: '複習' }
+                },
+                '7/30': {
+                    '國文': { task: '輕悅讀2篇', tag: '先修' },
+                    '英語': { task: '雪莉L36~L40 習題 + 單字361~380', tag: '複習' },
+                    '英語題': { task: '橘英B2 U5 模擬', tag: '複習' },
+                    '數學': { task: '橘數B2 U4 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 畢氏定理總複習', tag: '先修' },
+                    '自然': { task: '理化Ch2 (續)', tag: '先修' },
+                    '社會': { task: '歷史U4 複習', tag: '複習' }
+                },
+                '7/31': {
+                    '國文': { task: '成語D25~D31 總複習', tag: '複習' },
+                    '英語': { task: '雪莉L36~L40 總複習 + 單字381~400', tag: '複習' },
+                    '英語題': { task: '橘英B2 U5 總複習', tag: '複習' },
+                    '數學': { task: '橘數B2 U4 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U11 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch2 總複習', tag: '先修' },
+                    '社會': { task: '公民U4 複習', tag: '複習' }
+                }
+            }
+        },
+        'W5': {
+            days: {
+                '8/3': {
+                    '國文': { task: '形音義D32~D38', tag: '複習' },
+                    '英語': { task: '雪莉L41~L44 + 單字401~420', tag: '複習' },
+                    '英語題': { task: '橘英B1~B2 總複習', tag: '複習' },
+                    '數學': { task: '橘數B2 U5 p.57~62', tag: '複習' },
+                    '數學先': { task: '橘數B3 U12 因式分解 p.134~137', tag: '先修' },
+                    '自然': { task: '理化Ch3', tag: '先修' },
+                    '社會': { task: '地理U5', tag: '複習' }
+                },
+                '8/4': {
+                    '國文': { task: '文言文即時通2篇', tag: '先修' },
+                    '英語': { task: '雪莉L45~L48 + 單字421~440', tag: '複習' },
+                    '英語題': { task: '橘英B1~B2 模擬題', tag: '複習' },
+                    '數學': { task: '橘數B2 U5 p.63~68', tag: '複習' },
+                    '數學先': { task: '橘數B3 U12 因式分解 p.138~141', tag: '先修' },
+                    '自然': { task: '理化Ch3 (續)', tag: '先修' },
+                    '社會': { task: '歷史模擬試題', tag: '複習' }
+                },
+                '8/5': {
+                    '國文': { task: '形音義D32~D38 複習', tag: '複習' },
+                    '英語': { task: '雪莉L41~L48 複習 + 單字441~460', tag: '複習' },
+                    '英語題': { task: '橘英B1~B2 錯題重算', tag: '複習' },
+                    '數學': { task: '橘數B2 U5 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U12 因式分解 p.138~141', tag: '先修' },
+                    '自然': { task: '理化Ch3 總複習', tag: '先修' },
+                    '社會': { task: '公民U5', tag: '複習' }
+                },
+                '8/6': {
+                    '國文': { task: '文言文即時通2篇', tag: '先修' },
+                    '英語': { task: '雪莉L41~L48 習題 + 單字461~480', tag: '複習' },
+                    '英語題': { task: '橘英閱讀攻略', tag: '複習' },
+                    '數學': { task: '橘數B2 U5 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U12 因式分解總複習', tag: '先修' },
+                    '自然': { task: '理化Ch3 習題', tag: '先修' },
+                    '社會': { task: '地理U5 複習', tag: '複習' }
+                },
+                '8/7': {
+                    '國文': { task: '形音義D32~D38 總複習', tag: '複習' },
+                    '英語': { task: '雪莉L41~L48 總複習 + 單字481~500', tag: '複習' },
+                    '英語題': { task: '橘英B1~B2 總複習', tag: '複習' },
+                    '數學': { task: '橘數B2 U5 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U12 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch3 總複習', tag: '先修' },
+                    '社會': { task: '公民U5 複習', tag: '複習' }
+                }
+            }
+        },
+        'W6': {
+            days: {
+                '8/10': {
+                    '國文': { task: '成語D39~D45', tag: '複習' },
+                    '英語': { task: '雪莉L49~L50 + 單字501~520', tag: '複習' },
+                    '英語題': { task: '橘英B3 U1', tag: '先修' },
+                    '數學': { task: '橘數B2 U6 p.69~74', tag: '複習' },
+                    '數學先': { task: '橘數B3 U13 一元二次 p.142~147', tag: '先修' },
+                    '自然': { task: '理化Ch4', tag: '先修' },
+                    '社會': { task: '地理U6', tag: '複習' }
+                },
+                '8/11': {
+                    '國文': { task: '輕悅讀2篇', tag: '先修' },
+                    '英語': { task: '雪莉L51~L53 + 單字521~540', tag: '複習' },
+                    '英語題': { task: '橘英B3 U1', tag: '先修' },
+                    '數學': { task: '橘數B2 U6 p.75~79', tag: '複習' },
+                    '數學先': { task: '橘數B3 U13 一元二次 p.148~152', tag: '先修' },
+                    '自然': { task: '理化Ch4 (續)', tag: '先修' },
+                    '社會': { task: '公民U6', tag: '複習' }
+                },
+                '8/12': {
+                    '國文': { task: '成語D39~D45 複習', tag: '複習' },
+                    '英語': { task: '雪莉L54~L55 + 單字541~560', tag: '複習' },
+                    '英語題': { task: '橘英B3 U2', tag: '先修' },
+                    '數學': { task: '橘數B2 U6 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U13 一元二次 p.148~152', tag: '先修' },
+                    '自然': { task: '理化Ch4 總複習', tag: '先修' },
+                    '社會': { task: '歷史U4 複習', tag: '複習' }
+                },
+                '8/13': {
+                    '國文': { task: '輕悅讀2篇', tag: '先修' },
+                    '英語': { task: '雪莉L49~L55 複習 + 單字561~580', tag: '複習' },
+                    '英語題': { task: '橘英B3 U2', tag: '先修' },
+                    '數學': { task: '橘數B2 U6 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U13 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch4 習題', tag: '先修' },
+                    '社會': { task: '地理U6 複習', tag: '複習' }
+                },
+                '8/14': {
+                    '國文': { task: '成語D39~D45 總複習', tag: '複習' },
+                    '英語': { task: '雪莉L49~L55 習題 + 單字581~600', tag: '複習' },
+                    '英語題': { task: '橘英B3 U1~U2 總複習', tag: '先修' },
+                    '數學': { task: '橘數B2 U6 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 U13 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch4 總複習', tag: '先修' },
+                    '社會': { task: '公民U6 複習', tag: '複習' }
+                }
+            }
+        },
+        'W7': {
+            days: {
+                '8/17': {
+                    '國文': { task: '形音義D46~D52', tag: '複習' },
+                    '英語': { task: '雪莉L56~L57 + 單字601~620', tag: '複習' },
+                    '英語題': { task: '橘英B3 U3', tag: '先修' },
+                    '數學': { task: '橘數B2 U7 p.80~84', tag: '複習' },
+                    '數學先': { task: '橘數B3 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch5', tag: '先修' },
+                    '社會': { task: '地理模擬試題', tag: '複習' }
+                },
+                '8/18': {
+                    '國文': { task: '文言文即時通2篇', tag: '先修' },
+                    '英語': { task: '雪莉L56~L57 複習 + 單字621~640', tag: '複習' },
+                    '英語題': { task: '橘英B3 U3', tag: '先修' },
+                    '數學': { task: '橘數B2 U8 p.90~96', tag: '複習' },
+                    '數學先': { task: '橘數B3 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch5 (續)', tag: '先修' },
+                    '社會': { task: '公民U7', tag: '複習' }
+                },
+                '8/19': {
+                    '國文': { task: '形音義D46~D52 複習', tag: '複習' },
+                    '英語': { task: '雪莉L56~L57 總複習 + 單字641~660', tag: '複習' },
+                    '英語題': { task: '橘英B3 U3 複習', tag: '先修' },
+                    '數學': { task: '橘數B2 U7~8 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 錯題重算', tag: '先修' },
+                    '自然': { task: '理化Ch5 總複習', tag: '先修' },
+                    '社會': { task: '歷史U4 複習', tag: '複習' }
+                },
+                '8/20': {
+                    '國文': { task: '文言文即時通2篇', tag: '先修' },
+                    '英語': { task: '雪莉L56~L57 習題 + 單字661~680', tag: '複習' },
+                    '英語題': { task: '橘英B3 U3 模擬', tag: '先修' },
+                    '數學': { task: '橘數B2 U7~8 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch5 習題', tag: '先修' },
+                    '社會': { task: '公民U7 複習', tag: '複習' }
+                },
+                '8/21': {
+                    '國文': { task: '形音義D46~D52 總複習', tag: '複習' },
+                    '英語': { task: '雪莉L56~L57 總複習 + 單字681~700', tag: '複習' },
+                    '英語題': { task: '橘英B3 U3 總複習', tag: '先修' },
+                    '數學': { task: '橘數B2 U7~8 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B3 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch5 總複習', tag: '先修' },
+                    '社會': { task: '地理模擬複習', tag: '複習' }
+                }
+            }
+        },
+        'W8': {
+            days: {
+                '8/24': {
+                    '國文': { task: '成語D53~D59', tag: '複習' },
+                    '英語': { task: '雪莉L58~L60 + 錯字重背', tag: '複習' },
+                    '英語題': { task: '橘英B4 U4', tag: '先修' },
+                    '數學': { task: '橘數B2 U9 p.103~107', tag: '複習' },
+                    '數學先': { task: '橘數B4 U14 數列 p.153~160', tag: '先修' },
+                    '自然': { task: '理化Ch6', tag: '先修' },
+                    '社會': { task: '公民U8', tag: '複習' }
+                },
+                '8/25': {
+                    '國文': { task: '輕悅讀2篇', tag: '先修' },
+                    '英語': { task: '雪莉L58~L60 複習 + 錯字重背', tag: '複習' },
+                    '英語題': { task: '橘英B4 U4', tag: '先修' },
+                    '數學': { task: '橘數B2 U9 p.108~112', tag: '複習' },
+                    '數學先': { task: '橘數B4 U14 數列 p.161~165', tag: '先修' },
+                    '自然': { task: '理化Ch6 (續)', tag: '先修' },
+                    '社會': { task: '社會總複習', tag: '複習' }
+                },
+                '8/26': {
+                    '國文': { task: '成語D53~D59 複習', tag: '複習' },
+                    '英語': { task: '雪莉L58~L60 總複習 + 錯字重背', tag: '複習' },
+                    '英語題': { task: '橘英B4 U5', tag: '先修' },
+                    '數學': { task: '橘數B2 U9 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B4 U14 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch6 總複習', tag: '先修' },
+                    '社會': { task: '公民U8 複習', tag: '複習' }
+                },
+                '8/27': {
+                    '國文': { task: '輕悅讀2篇', tag: '先修' },
+                    '英語': { task: '雪莉L58~L60 習題 + 錯字重背', tag: '複習' },
+                    '英語題': { task: '橘英B4 U5', tag: '先修' },
+                    '數學': { task: '橘數B2 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B4 U14 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch6 習題', tag: '先修' },
+                    '社會': { task: '社會總複習 (續)', tag: '複習' }
+                },
+                '8/28': {
+                    '國文': { task: '成語D53~D59 總複習', tag: '複習' },
+                    '英語': { task: '雪莉L58~L60 總複習 + 錯字重背', tag: '複習' },
+                    '英語題': { task: '橘英B4 U4~U5 總複習', tag: '先修' },
+                    '數學': { task: '橘數B2 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B4 U14 總複習', tag: '先修' },
+                    '自然': { task: '理化Ch6 總複習', tag: '先修' },
+                    '社會': { task: '公民U8 複習', tag: '複習' }
+                }
+            }
+        },
+        'W9': {
+            days: {
+                '8/31': {
+                    '國文': { task: '形音義D60 完成！', tag: '複習' },
+                    '英語': { task: '雪莉L61~L63 + 聽寫最後100字', tag: '複習' },
+                    '英語題': { task: '橘英B4 總複習', tag: '先修' },
+                    '數學': { task: '橘數B2 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B4 U15~17 預覽', tag: '先修' },
+                    '自然': { task: '理化總複習', tag: '複習' },
+                    '社會': { task: '收心：整理書包', tag: '複習' }
+                },
+                '9/1': {
+                    '國文': { task: '文言文即時通最後2篇', tag: '先修' },
+                    '英語': { task: '雪莉L64~L71 + 聽寫最後100字', tag: '複習' },
+                    '英語題': { task: '橘英B4 模擬試題', tag: '先修' },
+                    '數學': { task: '橘數B2 總複習', tag: '複習' },
+                    '數學先': { task: '橘數B4 U15~17 預覽', tag: '先修' },
+                    '自然': { task: '畫「聲音vs光」比較表', tag: '複習' },
+                    '社會': { task: '寫下暑假學到的5個最重要觀念', tag: '複習' }
+                }
+            }
+        }
+    };
+
+    // ============================================================
+    //  3. 儲存與讀取
+    // ============================================================
+    const STORAGE_KEY = 'hl115_progress';
+
+    function loadProgress() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : {};
+        } catch { return {}; }
+    }
+
+    function saveProgress(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function getKey(weekId, date, subject) {
+        return `${weekId}_${date}_${subject}`;
+    }
+
+    function isChecked(weekId, date, subject) {
+        const data = loadProgress();
+        return !!data[getKey(weekId, date, subject)];
+    }
+
+    function toggleCheck(weekId, date, subject) {
+        const data = loadProgress();
+        const key = getKey(weekId, date, subject);
+        data[key] = !data[key];
+        saveProgress(data);
+        renderAll();
+    }
+
+    function toggleDayAll(weekId, date) {
+        const data = loadProgress();
+        const dayData = SCHEDULE[weekId]?.days?.[date];
+        if (!dayData) return;
+        const subjects = Object.keys(dayData);
+        const allChecked = subjects.every(s => data[getKey(weekId, date, s)]);
+        subjects.forEach(s => {
+            data[getKey(weekId, date, s)] = !allChecked;
+        });
+        saveProgress(data);
+        renderAll();
+    }
+
+    function resetWeek() {
+        // 找出目前所在的週次
+        const today = new Date();
+        const currentWeek = getCurrentWeekId(today);
+        if (!currentWeek) return;
+        if (!confirm(`確定要重置「${currentWeek}」的所有進度嗎？`)) return;
+        const data = loadProgress();
+        const weekData = SCHEDULE[currentWeek]?.days;
+        if (!weekData) return;
+        Object.keys(weekData).forEach(date => {
+            Object.keys(weekData[date]).forEach(subject => {
+                delete data[getKey(currentWeek, date, subject)];
+            });
+        });
+        saveProgress(data);
+        renderAll();
+    }
+
+    function resetAll() {
+        localStorage.removeItem(STORAGE_KEY);
+        renderAll();
+    }
+
+    let resetMode = 'all';
+
+    function showResetModal() {
+        resetMode = 'all';
+        document.getElementById('resetTargetText').textContent = '全部進度';
+        document.getElementById('resetModal').classList.add('active');
+    }
+
+    function closeResetModal() {
+        document.getElementById('resetModal').classList.remove('active');
+    }
+
+    function confirmReset() {
+        closeResetModal();
+        if (resetMode === 'all') resetAll();
+    }
+
+    // ============================================================
+    //  4. 計算與統計
+    // ============================================================
+    function getCurrentWeekId(today) {
+        const ds = today.toISOString().slice(0, 10).replace(/-/g, '/');
+        for (const w of WEEKS) {
+            const [start, end] = w.date.split(' ~ ');
+            const [sm, sd] = start.split('/').map(Number);
+            const [em, ed] = end.split('/').map(Number);
+            const sy = today.getFullYear();
+            const ey = today.getFullYear();
+            const startDate = new Date(sy, sm - 1, sd);
+            const endDate = new Date(ey, em - 1, ed);
+            if (today >= startDate && today <= endDate) return w.id;
+        }
+        // 如果不在任何週次內，回傳 W1
+        return 'W1';
+    }
+
+    function getAllTasks() {
+        const tasks = [];
+        for (const weekId of Object.keys(SCHEDULE)) {
+            const week = SCHEDULE[weekId];
+            for (const date of Object.keys(week.days)) {
+                const day = week.days[date];
+                for (const subject of Object.keys(day)) {
+                    tasks.push({ weekId, date, subject, task: day[subject] });
+                }
+            }
+        }
+        return tasks;
+    }
+
+    function getStats() {
+        const tasks = getAllTasks();
+        const total = tasks.length;
+        const data = loadProgress();
+        let done = 0;
+        tasks.forEach(t => {
+            if (data[getKey(t.weekId, t.date, t.subject)]) done++;
+        });
+        return { total, done, percent: total ? Math.round(done / total * 100) : 0 };
+    }
+
+    function getWeekStats(weekId) {
+        const week = SCHEDULE[weekId];
+        if (!week) return { total: 0, done: 0, percent: 0 };
+        const tasks = [];
+        for (const date of Object.keys(week.days)) {
+            for (const subject of Object.keys(week.days[date])) {
+                tasks.push({ date, subject });
+            }
+        }
+        const total = tasks.length;
+        const data = loadProgress();
+        let done = 0;
+        tasks.forEach(t => {
+            if (data[getKey(weekId, t.date, t.subject)]) done++;
+        });
+        return { total, done, percent: total ? Math.round(done / total * 100) : 0 };
+    }
+
+    function getSubjectStats() {
+        const tasks = getAllTasks();
+        const data = loadProgress();
+        const subjectMap = {};
+        tasks.forEach(t => {
+            if (!subjectMap[t.subject]) subjectMap[t.subject] = { total: 0, done: 0 };
+            subjectMap[t.subject].total++;
+            if (data[getKey(t.weekId, t.date, t.subject)]) subjectMap[t.subject].done++;
+        });
+        let completed = 0;
+        for (const s of Object.keys(subjectMap)) {
+            if (subjectMap[s].done === subjectMap[s].total) completed++;
+        }
+        return { completed, total: Object.keys(subjectMap).length };
+    }
+
+    // ============================================================
+    //  5. 渲染
+    // ============================================================
+    let currentFilter = 'all';
+
+    function renderAll() {
+        renderStats();
+        renderWeeks();
+        renderToday();
+    }
+
+    function renderStats() {
+        const stats = getStats();
+        document.getElementById('statTotal').textContent = `${stats.done}/${stats.total}`;
+        document.getElementById('statTotalBar').style.width = stats.percent + '%';
+
+        // 本週
+        const today = new Date();
+        const weekId = getCurrentWeekId(today);
+        const weekStats = getWeekStats(weekId);
+        document.getElementById('statWeek').textContent = weekStats.percent + '%';
+        document.getElementById('statWeekBar').style.width = weekStats.percent + '%';
+
+        // 科目
+        const subStats = getSubjectStats();
+        const subPercent = subStats.total ? Math.round(subStats.completed / subStats.total * 100) : 0;
+        document.getElementById('statSubject').textContent = `${subStats.completed}/${subStats.total}`;
+        document.getElementById('statSubjectBar').style.width = subPercent + '%';
+    }
+
+    function renderToday() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        const wd = weekdays[now.getDay()];
+        document.getElementById('todayDisplay').textContent = `${y}/${m}/${d} (${wd})`;
+
+        const weekId = getCurrentWeekId(now);
+        const week = WEEKS.find(w => w.id === weekId);
+        const stats = getWeekStats(weekId);
+        document.getElementById('weekInfo').textContent = week ? `${week.label} ${week.date} · 完成 ${stats.done}/${stats.total}` : '—';
+    }
+
+    function renderWeeks() {
+        const container = document.getElementById('weekContainer');
+        let html = '';
+        const data = loadProgress();
+
+        for (const week of WEEKS) {
+            const weekId = week.id;
+            const weekData = SCHEDULE[weekId];
+            if (!weekData) continue;
+            const stats = getWeekStats(weekId);
+            const isComplete = stats.done === stats.total && stats.total > 0;
+            const isPartial = stats.done > 0 && stats.done < stats.total;
+            const statusClass = isComplete ? 'completed' : (isPartial ? 'incomplete' : '');
+
+            html += `<div class="week-block ${statusClass}" data-week="${weekId}">`;
+            html += `<div class="week-header" onclick="toggleWeek('${weekId}')">`;
+            html += `<div><span class="week-title">${week.label}</span><span class="week-date">${week.date}</span></div>`;
+            html += `<div class="week-progress">${stats.done}/${stats.total} (${stats.percent}%)</div>`;
+            html += `</div>`;
+            html += `<div class="week-body" id="weekBody_${weekId}">`;
+
+            // 每日格子
+            const dates = Object.keys(weekData.days);
+            html += `<div class="day-grid">`;
+            for (const date of dates) {
+                const dayData = weekData.days[date];
+                const dateObj = new Date(date.split('/').map(Number));
+                const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+                const wd = weekdays[dateObj.getDay()];
+                const isToday = date === new Date().toISOString().slice(5, 10).replace('-', '/');
+
+                // 計算該日完成數
+                const subjects = Object.keys(dayData);
+                let dayDone = 0;
+                subjects.forEach(s => { if (data[getKey(weekId, date, s)]) dayDone++; });
+                const allChecked = dayDone === subjects.length && subjects.length > 0;
+
+                html += `<div class="day-card" style="${isToday ? 'border: 2px solid #1a3a5c;' : ''}">`;
+                html += `<div class="day-title">`;
+                html += `<span>${date} (${wd})${isToday ? ' ⭐今天' : ''}</span>`;
+                html += `<span class="check-all" onclick="toggleDayAll('${weekId}','${date}')">${allChecked ? '☑ 全部取消' : '☐ 全部勾選'}</span>`;
+                html += `</div>`;
+
+                // 依序顯示各科目
+                const subjectOrder = ['國文', '英語', '英語題', '數學', '數學先', '自然', '社會'];
+                for (const subject of subjectOrder) {
+                    if (!dayData[subject]) continue;
+                    const info = dayData[subject];
+                    const checked = data[getKey(weekId, date, subject)] || false;
+                    const tagClass = info.tag === '複習' ? 'review' : 'advance';
+                    const displaySubject = subject === '英語題' ? '英語(題)' : (subject === '數學先' ? '數學(先)' : subject);
+                    const displayTask = checked ? `<span class="done">${info.task}</span>` : info.task;
+
+                    // 檢查篩選
+                    let show = true;
+                    if (currentFilter !== 'all') {
+                        if (subject === '英語題' && currentFilter !== '英語') show = false;
+                        else if (subject === '數學先' && currentFilter !== '數學') show = false;
+                        else if (subject !== '英語題' && subject !== '數學先' && subject !== currentFilter) show = false;
+                    }
+
+                    html += `<div class="subject-row ${show ? 'show' : ''}" data-subject="${subject}">`;
+                    html += `<input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCheck('${weekId}','${date}','${subject}')">`;
+                    html += `<span class="subject-label">${SUBJECT_ICONS[displaySubject] || ''} ${displaySubject}</span>`;
+                    html += `<span class="task"><span class="tag ${tagClass}">${info.tag}</span> ${displayTask}</span>`;
+                    html += `</div>`;
+                }
+
+                // 睡前回想
+                const checkedRecall = data[getKey(weekId, date, '睡前回想')] || false;
+                html += `<div class="subject-row show" data-subject="睡前回想" style="border-top: 2px dashed #d5dbe3; margin-top:4px; padding-top:6px;">`;
+                html += `<input type="checkbox" ${checkedRecall ? 'checked' : ''} onchange="toggleCheck('${weekId}','${date}','睡前回想')">`;
+                html += `<span class="subject-label">🌙</span>`;
+                html += `<span class="task">睡前回想 (闔書回答3個問題) ${checkedRecall ? '✅' : ''}</span>`;
+                html += `</div>`;
+
+                html += `</div>`;
+            }
+            html += `</div>`;
+
+            html += `</div>`;
+            html += `</div>`;
+        }
+
+        container.innerHTML = html;
+    }
+
+    function toggleWeek(weekId) {
+        const body = document.getElementById(`weekBody_${weekId}`);
+        if (body) body.classList.toggle('open');
+    }
+
+    // ============================================================
+    //  6. 事件綁定
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // 預設展開當前週
+        const today = new Date();
+        const currentWeek = getCurrentWeekId(today);
+        setTimeout(() => {
+            const body = document.getElementById(`weekBody_${currentWeek}`);
+            if (body) body.classList.add('open');
+        }, 100);
+
+        // 篩選按鈕
+        document.querySelectorAll('.filter-group button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-group button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderWeeks();
+            });
+        });
+
+        // 點擊彈窗外部關閉
+        document.getElementById('resetModal').addEventListener('click', function(e) {
+            if (e.target === this) closeResetModal();
+        });
+
+        renderAll();
+    });
+
+    // ============================================================
+    //  7. 印出功能（簡易）
+    // ============================================================
+    console.log('✅ 翰林輔才115 進度追蹤已載入');
+    console.log('📊 總任務數:', getAllTasks().length);
+    console.log('📈 完成度:', getStats().percent + '%');
+</script>
+</body>
+</html>
