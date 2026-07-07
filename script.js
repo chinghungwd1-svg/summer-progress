@@ -3,6 +3,7 @@
 // ============================================================
 const API_URL = 'https://script.google.com/macros/s/AKfycbwXnZRPTnoXnsSasI3xnYZlUOQvaCd62XhPbFxY9JqPNYKnbpW2BXB2V2MYl76pIfnBkQ/exec';
 
+
 // ============================================================
 //  1. 資料定義
 // ============================================================
@@ -25,7 +26,7 @@ const SUBJECT_ICONS = { '國文': '📘', '英語': '📗', '數學': '📙', '�
 // ============================================================
 const GANTT_DATA = [
     { book: '📘 日日讀形音義', short: '形音義', weeks: { 'W1': 'D1~D10', 'W2': '—', 'W3': 'D18~D24', 'W4': '—', 'W5': 'D32~D38', 'W6': '—', 'W7': 'D46~D52', 'W8': '—', 'W9': 'D60🎉' }, type: '國文' },
-    { book: '📘 日日讀成語', short: '成語', weeks: { 'W1': '—', 'W2': 'D11~D17', 'W3': '—', 'W4': 'D25~D31', 'W5': '—', 'W6': 'D39~D45', 'W7': '—', 'W8': 'D53~D59', 'W9': '—' }, type: '國文' },
+    { book: '📘 日日讀成語', short: '成語', weeks: { 'W1': 'D1~D10', 'W2': 'D11~D17', 'W3': '—', 'W4': 'D25~D31', 'W5': '—', 'W6': 'D39~D45', 'W7': '—', 'W8': 'D53~D59', 'W9': 'D60🎉' }, type: '國文' },
     { book: '📘 文言文即時通', short: '文言文', weeks: { 'W1': '2篇', 'W2': '—', 'W3': '2篇', 'W4': '—', 'W5': '2篇', 'W6': '—', 'W7': '2篇', 'W8': '—', 'W9': '2篇' }, type: '國文' },
     { book: '📘 每週輕悅讀', short: '輕悅讀', weeks: { 'W1': '—', 'W2': '2篇', 'W3': '—', 'W4': '2篇', 'W5': '—', 'W6': '2篇', 'W7': '—', 'W8': '2篇', 'W9': '—' }, type: '國文' },
     { book: '📗 雪莉老師文法', short: '雪莉文法', weeks: { 'W1': 'L1~L13', 'W2': 'L14~L23', 'W3': 'L24~L35', 'W4': 'L36~L40', 'W5': 'L41~L48', 'W6': 'L49~L55', 'W7': 'L56~L57', 'W8': 'L58~L60', 'W9': 'L61~L71' }, type: '英語' },
@@ -41,8 +42,7 @@ const GANTT_DATA = [
 ];
 
 // ============================================================
-//  3. 每日打卡資料（W1~W9）
-//    ⚠️ 已依照您的最終計畫表逐日修正
+//  3. 每日打卡資料（W1~W9 完整版）
 // ============================================================
 const SCHEDULE = {
     // ==========================================================
@@ -51,7 +51,7 @@ const SCHEDULE = {
     'W1': {
         days: {
             '7/3': {
-                '國文': { task: '形音義D1~D5', tag: '複習' },
+                '國文': { task: '形音義D1~D5 + 成語D1~D4', tag: '複習' },
                 '英語': { task: '雪莉L1~L4 + 單字1~20', tag: '複習' },
                 '英語題': { task: '橘英B1 U1', tag: '複習' },
                 '數學': { task: '橘數B1 U1 數線 p.5~10', tag: '複習' },
@@ -78,7 +78,7 @@ const SCHEDULE = {
                 '社會': { task: '🛌 休息日', tag: '休息' }
             },
             '7/6': {
-                '國文': { task: '形音義D6~D10', tag: '複習' },
+                '國文': { task: '形音義D6~D10 + 成語D5~D10', tag: '複習' },
                 '英語': { task: '雪莉L5~L8 + 單字21~40', tag: '複習' },
                 '英語題': { task: '橘英B1 U1', tag: '複習' },
                 '數學': { task: '橘數B1 U1 數線 p.11~17', tag: '複習' },
@@ -91,12 +91,12 @@ const SCHEDULE = {
                 '英語': { task: '雪莉L1~L8複習 + 單字41~60', tag: '複習' },
                 '英語題': { task: '橘英B1 U2', tag: '複習' },
                 '數學': { task: '橘數B1 U2 因數倍數 p.18~25', tag: '複習' },
-                '數學先': { task: '橘數B3 U10 多項式 p.118~122', tag: '先修' },  // ✅ 修正
+                '數學先': { task: '橘數B3 U10 多項式 p.118~122', tag: '先修' },
                 '自然': { task: '生物Ch1 總複習', tag: '複習' },
                 '社會': { task: '公民U1 公民身分', tag: '複習' }
             },
             '7/8': {
-                '國文': { task: '形音義D1~D10錯字重寫', tag: '複習' },
+                '國文': { task: '形音義D1~D10錯字重寫 + 成語D1~D10複習', tag: '複習' },
                 '英語': { task: '雪莉L9~L10 + 單字61~80', tag: '複習' },
                 '英語題': { task: '橘英B1 U2', tag: '複習' },
                 '數學': { task: '橘數B1 U2 分數運算 p.26~33', tag: '複習' },
@@ -114,7 +114,7 @@ const SCHEDULE = {
                 '社會': { task: '歷史U1 複習', tag: '複習' }
             },
             '7/10': {
-                '國文': { task: '形音義D1~D10總複習', tag: '複習' },
+                '國文': { task: '形音義D1~D10總複習 + 成語D1~D10總複習', tag: '複習' },
                 '英語': { task: '雪莉L9~L13複習 + 單字總複習', tag: '複習' },
                 '英語題': { task: '橘英B1 U1~U2 模擬題', tag: '複習' },
                 '數學': { task: '橘數B1 U1~U2 總複習', tag: '複習' },
@@ -660,7 +660,25 @@ const SCHEDULE = {
 };
 
 // ============================================================
-//  4. Google Sheets API
+//  4. 註記資料儲存
+// ============================================================
+function getNoteKey(weekId, date) {
+    return 'note_' + weekId + '_' + date;
+}
+
+function saveNote(weekId, date, text) {
+    var key = getNoteKey(weekId, date);
+    progressData[key] = text;
+    saveToCloud(progressData);
+}
+
+function loadNote(weekId, date) {
+    var key = getNoteKey(weekId, date);
+    return progressData[key] || '';
+}
+
+// ============================================================
+//  5. Google Sheets API
 // ============================================================
 let progressData = {};
 
@@ -704,7 +722,7 @@ async function saveToCloud(progress) {
 }
 
 // ============================================================
-//  5. 核心邏輯
+//  6. 核心邏輯
 // ============================================================
 var currentFilter = 'all';
 var currentMode = 'day';
@@ -810,7 +828,7 @@ function getSubjectStats() {
 }
 
 // ============================================================
-//  6. 渲染
+//  7. 渲染
 // ============================================================
 function renderAll() {
     renderStats();
@@ -854,12 +872,15 @@ function renderToday() {
     statusEl.textContent = w ? w.label + ' · ' + ws.done + '/' + ws.total : '—';
 }
 
+// ============================================================
+//  7a. 甘特圖渲染（強化版：顯示完成狀態標記）
+// ============================================================
 function renderGantt() {
     var container = document.getElementById('ganttContainer');
     var html = '<div class="gantt-legend">' +
-        '<span><span class="dot green"></span>已完成</span>' +
-        '<span><span class="dot yellow"></span>部分完成</span>' +
-        '<span><span class="dot gray"></span>未開始</span>' +
+        '<span><span class="dot green"></span>已完成 ✅</span>' +
+        '<span><span class="dot yellow"></span>部分完成 ⚠️</span>' +
+        '<span><span class="dot gray"></span>未開始 ⬜</span>' +
         '</div>';
 
     for (var b = 0; b < GANTT_DATA.length; b++) {
@@ -935,8 +956,8 @@ function renderGantt() {
             var cls2 = status2 === 'done' ? 'done' : (status2 === 'partial' ? 'partial' : 'empty');
             var label2 = val2 === '—' ? '—' : val2;
             var pageInfo = book.pages && book.pages[wid2] ? ' <span class="sub-task">' + book.pages[wid2] + '</span>' : '';
-            var doneMark = status2 === 'done' ? ' ✅' : '';
-            html += '<div class="gantt-cell ' + cls2 + '">' + label2 + pageInfo + doneMark + '</div>';
+            var statusSymbol = cls2 === 'done' ? ' ✅' : (cls2 === 'partial' ? ' ⚠️' : (val2 !== '—' ? ' ⬜' : ''));
+            html += '<div class="gantt-cell ' + cls2 + '">' + label2 + pageInfo + statusSymbol + '</div>';
         }
         html += '</div>';
 
@@ -951,6 +972,9 @@ function toggleGanttBook(header) {
     if (body) body.classList.toggle('open');
 }
 
+// ============================================================
+//  7b. 每日打卡渲染（含註記欄）
+// ============================================================
 function renderDayView() {
     var container = document.getElementById('dayContainer');
     var html = '';
@@ -984,12 +1008,10 @@ function renderDayView() {
         for (var di = 0; di < dates.length; di++) {
             var date = dates[di];
             var day = wd.days[date];
-
             var dateParts = date.split('/').map(Number);
-            var dt = new Date(2026, dateParts[0] - 1, dateParts[1]); // 使用固定年份 2026
+            var dt = new Date(2026, dateParts[0] - 1, dateParts[1]);
             var weekdays = ['日', '一', '二', '三', '四', '五', '六'];
             var wdStr = weekdays[dt.getDay()];
-            
             var todayStr = new Date().toISOString().slice(5, 10).replace('-', '/');
             var isToday = date === todayStr;
 
@@ -1009,11 +1031,9 @@ function renderDayView() {
 
             html += '<div class="day-card ' + cardClass + '">';
             html += '<div class="day-title">';
-            
             var dateLabel = isRestDay ? '🛌 ' + date : (isReviewDay ? '🔄 ' + date : date);
-            html += '<span>' + dateLabel + ' <strong style="color:#2a5f7a;background:#e3f0fa;padding:0 6px;border-radius:4px;">' + wdStr + '</strong>' + (isToday ? ' ⭐今天' : '') + '</span>';
-            
-            
+            html += '<span>' + dateLabel + ' <strong style="color:#2a5f7a;background:#e3f0fa;padding:0 6px;border-radius:4px;">' +
+                wdStr + '</strong>' + (isToday ? ' ⭐今天' : '') + '</span>';
             if (!isRestDay && !isReviewDay) {
                 html += '<span class="check-all" onclick="toggleDayAll(\'' + wid + '\',\'' + date + '\')">' + (allChecked ?
                     '☑ 全部取消' : '☐ 全部勾選') + '</span>';
@@ -1072,6 +1092,16 @@ function renderDayView() {
             html += '<span class="task">睡前回想 ' + (recall ? '✅' : '') + '</span>';
             html += '</div>';
 
+            // ===== 註記欄 =====
+            var noteText = loadNote(wid, date);
+            html += '<div class="note-section" onclick="event.stopPropagation();">';
+            html += '<span class="note-label">📝 今日註記：</span>';
+            html += '<textarea rows="1" placeholder="紀錄卡關點、明天重點... (按 Enter 儲存)" ' +
+                'onchange="saveNoteField(\'' + wid + '\',\'' + date + '\', this.value)" ' +
+                'onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault();this.blur();}">' +
+                noteText + '</textarea>';
+            html += '</div>';
+
             html += '</div>';
         }
 
@@ -1086,13 +1116,20 @@ function renderDayView() {
     if (body) body.classList.add('open');
 }
 
+// ============================================================
+//  7c. 儲存註記
+// ============================================================
+function saveNoteField(weekId, date, text) {
+    saveNote(weekId, date, text);
+}
+
 function toggleWeek(wid) {
     var el = document.getElementById('weekBody_' + wid);
     if (el) el.classList.toggle('open');
 }
 
 // ============================================================
-//  7. 模式切換
+//  8. 模式切換
 // ============================================================
 function switchMode(mode) {
     currentMode = mode;
@@ -1115,7 +1152,7 @@ function switchMode(mode) {
 }
 
 // ============================================================
-//  8. 同步＆重置
+//  9. 同步＆重置
 // ============================================================
 async function syncWithCloud() {
     var st = document.getElementById('syncStatus');
@@ -1152,7 +1189,7 @@ async function confirmReset() {
 }
 
 // ============================================================
-//  9. 初始化
+//  10. 初始化
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     var filterBtns = document.querySelectorAll('.filter-group button');
@@ -1191,4 +1228,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-console.log('✅ 暑期進度追蹤已載入 (修正版)');
+console.log('✅ 暑期進度追蹤已載入 (完整版)');
